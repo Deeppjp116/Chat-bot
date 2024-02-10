@@ -12,7 +12,7 @@ class MessageParser {
       .post('http://localhost:9999/', { text: message })
       .then((response) => {
         console.log(response.data);
-
+        console.log('Data resived');
         const responseData = response.data;
         console.log(responseData.fulfillmentText);
         if (responseData && responseData.fulfillmentText) {

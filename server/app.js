@@ -5,7 +5,8 @@ const cors = require('cors');
 const { SessionsClient } = require('@google-cloud/dialogflow');
 const path = require('path');
 const mongoose = require('mongoose');
-const User = require('./shemas/User');
+
+const Order = require('./shemas/Order');
 
 // Create an Express application
 const app = express();
@@ -45,23 +46,27 @@ db.once('open', () => {
 
 // Function to create a default user in MongoDB
 const createDefaultUser = async () => {
-  try {
-    const newUser = new User({
-      username: 'john_doe',
-      email: 'john@example.com',
-      password: 'secretpassword',
-    });
-
-    // Save the new user to the database
-    const user = await newUser.save();
-    console.log('User created:', user);
-  } catch (error) {
-    console.error('Error creating user:', error);
-  }
+  // try {
+  //   const newUser = new User({
+  //     username: 'john_doe',
+  //     email: 'john@example.com',
+  //     password: 'secretpassword',
+  //   });
+  //   // Save the new user to the database
+  //   const user = await newUser.save();
+  //   console.log('User created:', user);
+  // } catch (error) {
+  //   console.error('Error creating user:', error);
+  // }
 };
 
 // Run the function to create a default user when the server starts
 createDefaultUser();
+
+let temporaryOrder = {
+  items: [],
+  quantities: [],
+};
 
 // Define a route for handling POST requests
 app.post('/', async (req, res) => {
@@ -87,7 +92,74 @@ app.post('/', async (req, res) => {
     res.send(result);
 
     // Log the result after sending the response to avoid potential issues with async behavior
-    console.log(result);
+    // console.log(result.intent.displayName);
+    const intention = result.intent.displayName;
+    const foodItemValues =
+      result?.parameters?.fields['food-item']?.listValue?.values;
+    const quntityOfItems =
+      result?.parameters?.fields?.number?.listValue?.values;
+
+    switch (intention) {
+      case 'order.add - context: ongoing-order':
+        // Save items and quantities temporarily
+        temporaryOrder.items = [
+          ...temporaryOrder.items,
+          ...(foodItemValues || []),
+        ];
+        temporaryOrder.quantities = [
+          ...temporaryOrder.quantities,
+          ...(quntityOfItems || []),
+        ];
+        console.log('Orders Added in the basket ');
+        break;
+
+      case 'order.complete - context: ongoing-order':
+        // Save the order in the database
+        try {
+          const newOrder = new Order({
+            items: temporaryOrder.items,
+            quantity: temporaryOrder.quantities,
+          });
+          const savedOrder = await newOrder.save();
+          console.log('Order has been saved:', savedOrder);
+
+          // Clear the temporary order after saving in the database
+          temporaryOrder = {
+            items: [],
+            quantities: [],
+          };
+        } catch (error) {
+          console.error('Error saving order:', error);
+        }
+        break;
+
+      case 'order.remove - context: ongoing-order':
+        try {
+          // Check if specific item and quantity to remove are provided
+          if (foodItemValues) {
+            // Find and remove the specified item and quantity from the temporary order
+            console.log(foodItemValues);
+            const updatedItems = temporaryOrder.items.filter((item, index) => {
+              console.log('here is the items for remove', item.stringValue);
+              return !foodItemValues.stringValue.includes(item.stringValue);
+            });
+
+            temporaryOrder.items = updatedItems;
+            console.log(
+              'Specific item and quantity removed from the order:',
+              temporaryOrder
+            );
+          } else {
+            console.log('No specific item and quantity provided for removal.');
+          }
+          break;
+        } catch (error) {
+          console.error('Error removing specific item and quantity:', error);
+        }
+
+      default:
+        break;
+    }
   } catch (error) {
     // Handle errors and send an appropriate response
     console.error('Error processing request:', error);
