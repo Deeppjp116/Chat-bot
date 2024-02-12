@@ -88,9 +88,6 @@ app.post('/', async (req, res) => {
     // Call the detectIntent function to interact with Dialogflow
     const result = await detectIntent(projectId, sessionId, requestData);
 
-    // Send the result back as the response
-    res.send(result);
-
     // Log the result after sending the response to avoid potential issues with async behavior
     // console.log(result.intent.displayName);
     const intention = result.intent.displayName;
@@ -98,6 +95,8 @@ app.post('/', async (req, res) => {
       result?.parameters?.fields['food-item']?.listValue?.values;
     const quntityOfItems =
       result?.parameters?.fields?.number?.listValue?.values;
+
+    const orderID = requestData;
 
     switch (intention) {
       case 'order.add - context: ongoing-order':
@@ -157,7 +156,32 @@ app.post('/', async (req, res) => {
           console.error('Error removing specific item and quantity:', error);
         }
 
+      case 'track.order - context: ongoing-tracking':
+        try {
+          console.log('Track Order ID');
+          const order = await Order.findById(orderID);
+          if (!order) {
+            console.log('Order not found');
+            return res.status(404).send({ error: 'Order not found' });
+          }
+
+          console.log('Found Order:', order);
+          res.status(200).send(order); // Send the response directly
+        } catch (error) {
+          console.error('Error processing track order request:', error);
+          res.status(error.statusCode || 500).send({ error: error.message });
+          if (!res.headersSent) {
+            res.status(500).send({ error: 'Internal Server Error' });
+          } else {
+            console.error(
+              'Headers already sent. Unable to send error response.'
+            );
+          }
+        }
+        break; // Add this break statement to exit the switch block
+
       default:
+        res.status(200).send(result);
         break;
     }
   } catch (error) {
