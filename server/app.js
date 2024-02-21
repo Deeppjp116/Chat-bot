@@ -1,4 +1,5 @@
 // Import required modules
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -10,6 +11,7 @@ const Order = require('./shemas/Order');
 
 // Create an Express application
 const app = express();
+const { Types } = mongoose;
 
 // Middleware setup
 app.use(express.json());
@@ -110,6 +112,7 @@ app.post('/', async (req, res) => {
           ...(quntityOfItems || []),
         ];
         console.log('Orders Added in the basket ');
+        res.status(200).send(result);
         break;
 
       case 'order.complete - context: ongoing-order':
@@ -130,6 +133,7 @@ app.post('/', async (req, res) => {
         } catch (error) {
           console.error('Error saving order:', error);
         }
+        res.status(200).send(result);
         break;
 
       case 'order.remove - context: ongoing-order':
@@ -151,6 +155,7 @@ app.post('/', async (req, res) => {
           } else {
             console.log('No specific item and quantity provided for removal.');
           }
+          res.status(200).send(result);
           break;
         } catch (error) {
           console.error('Error removing specific item and quantity:', error);
@@ -159,24 +164,34 @@ app.post('/', async (req, res) => {
       case 'track.order - context: ongoing-tracking':
         try {
           console.log('Track Order ID');
-          const order = await Order.findById(orderID);
+
+          // Check if orderID is a valid format before creating an ObjectId
+          const orderIDString = String(orderID);
+          const isValidObjectId = Types.ObjectId.isValid(orderIDString);
+
+          if (!isValidObjectId) {
+            console.log('Invalid Order ID format');
+            return res.status(400).send({ error: 'Invalid Order ID format' });
+          }
+
+          // Create a valid ObjectId instance using the string
+          const validOrderID = new Types.ObjectId(orderIDString);
+
+          // Find the order using the valid ObjectId
+          const order = await Order.findById(validOrderID);
+
           if (!order) {
             console.log('Order not found');
             return res.status(404).send({ error: 'Order not found' });
           }
 
           console.log('Found Order:', order);
-          res.status(200).send(order); // Send the response directly
+
+          // Send the response including the order data
+          res.status(200).send(...result, order);
         } catch (error) {
           console.error('Error processing track order request:', error);
           res.status(error.statusCode || 500).send({ error: error.message });
-          if (!res.headersSent) {
-            res.status(500).send({ error: 'Internal Server Error' });
-          } else {
-            console.error(
-              'Headers already sent. Unable to send error response.'
-            );
-          }
         }
         break; // Add this break statement to exit the switch block
 
