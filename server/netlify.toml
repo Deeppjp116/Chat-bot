@@ -1,0 +1,3 @@
+[build]
+  command = "npm run build"  # Adjust this based on your server build script
+  functions = "functions"    # Adjust this based on your server code location
