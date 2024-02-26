@@ -45,26 +45,6 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Connected to MongoDB');
 });
-
-// Function to create a default user in MongoDB
-const createDefaultUser = async () => {
-  // try {
-  //   const newUser = new User({
-  //     username: 'john_doe',
-  //     email: 'john@example.com',
-  //     password: 'secretpassword',
-  //   });
-  //   // Save the new user to the database
-  //   const user = await newUser.save();
-  //   console.log('User created:', user);
-  // } catch (error) {
-  //   console.error('Error creating user:', error);
-  // }
-};
-
-// Run the function to create a default user when the server starts
-createDefaultUser();
-
 let temporaryOrder = {
   items: [],
   quantities: [],
@@ -188,7 +168,7 @@ app.post('/', async (req, res) => {
           console.log('Found Order:', order);
 
           // Send the response including the order data
-          res.status(200).send(...result, order);
+          res.status(200).send({ result, order });
         } catch (error) {
           console.error('Error processing track order request:', error);
           res.status(error.statusCode || 500).send({ error: error.message });

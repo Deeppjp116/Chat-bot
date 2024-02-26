@@ -16,12 +16,17 @@ class MessageParser {
         const responseData = response.data;
 
         // Check the type of response and handle accordingly
-        switch (responseData?.intent?.displayName) {
+        switch (responseData?.result?.intent?.displayName) {
           case 'track.order - context: ongoing-tracking':
             // Handle track.order response
             const orderData = responseData.order;
             console.log('Order Data:', orderData);
+            const foodItems = orderData.items.map((item) => item.stringValue);
+            const foodItemsString = foodItems.join(',');
             // Perform actions based on orderData
+            this.actionProvider.handleAction(
+              `Here is the Food items ${foodItemsString}`
+            );
             break;
           default:
             // Handle other types of responses
