@@ -1,3 +1,7 @@
 [build]
-  command = "npm run build"  # Adjust this based on your server build script
-  functions = "functions"    # Adjust this based on your server code location
+  command = "npm run build"  # Replace with your build script
+  publish = "dist"  # Replace with the path to your build output
+
+[[functions]]
+  directory = "functions"  # Replace with the path to your serverless functions
+  include = ["*.js", "*.ts"]  # Adjust file extensions accordingly
