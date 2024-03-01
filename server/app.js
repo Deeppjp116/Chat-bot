@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cors());
 
 // Set the port for the server
-const PORT = 9999;
+const PORT = process.env.PORT || 9999;
 
 // Set the path for Google Cloud credentials
 const credentialsPath = path.join(
