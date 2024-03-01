@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "build": "node app.js"
+    "build": "netlify deploy --prod"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

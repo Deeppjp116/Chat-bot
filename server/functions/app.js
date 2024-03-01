@@ -1,6 +1,7 @@
 // Import required modules
 
 const express = require('express');
+const serverless = require('serverless-http');
 const cors = require('cors');
 const { SessionsClient } = require('@google-cloud/dialogflow');
 const path = require('path');
@@ -11,11 +12,12 @@ const Order = require('./shemas/Order');
 
 // Create an Express application
 const app = express();
+const router = express.Router();
 const { Types } = mongoose;
 
 // Middleware setup
-app.use(express.json());
-app.use(cors());
+router.use(express.json());
+router.use(cors());
 
 // Set the port for the server
 const PORT = process.env.PORT || 9999;
@@ -51,7 +53,7 @@ let temporaryOrder = {
 };
 
 // Define a route for handling POST requests
-app.post('/', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     // Extract text data from the request body
     const requestData = req.body?.text;
@@ -187,7 +189,7 @@ app.post('/', async (req, res) => {
 });
 
 // Start the server and listen on the specified port
-app.listen(PORT, () => {
+router.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
 
@@ -214,3 +216,6 @@ async function detectIntent(projectId, sessionId, requestData) {
   // Return the detected intent from the response
   return responses[0].queryResult;
 }
+
+router.use('./netlify/functions/api', router);
+module.exports.handler = serverless(app);
