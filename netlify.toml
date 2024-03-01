@@ -1,7 +1,7 @@
 # netlify.toml
 
 [build]
-  command = "npm run build"  # Adjust this based on your client build command
+  command = "cd client && npm install && npm run build"  # Adjust this based on your client build command
   publish = "client/build"   # Adjust this based on your client build output
 
 [[redirects]]
