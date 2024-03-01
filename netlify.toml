@@ -1,0 +1,19 @@
+# netlify.toml
+
+[build]
+  command = "npm run build"  # Adjust this based on your client build command
+  publish = "client/build"   # Adjust this based on your client build output
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://localhost:3000/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  # Set environment variables needed for your server build
+  SERVER_ENV_VARIABLE = "your_server_environment_variable_value"
