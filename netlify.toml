@@ -6,7 +6,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "http://localhost:3000/:splat"
+  to = "http://localhost:9999/:splat"
   status = 200
 
 [[redirects]]
@@ -16,4 +16,6 @@
 
 [build.environment]
   # Set environment variables needed for your server build
-  SERVER_ENV_VARIABLE = "your_server_environment_variable_value"
+    GOOGLE_APPLICATION_CREDENTIALS="deno-chatbot-grfc-e9ed84a6ca53.json"
+    MONGODB_URI="mongodb+srv://deeppjp1656:1234567890@advancedchat.gbjhu9o.mongodb.net/?retryWrites=true&w=majority"
+    NODE_ENV="production"
