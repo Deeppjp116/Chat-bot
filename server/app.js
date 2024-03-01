@@ -8,19 +8,18 @@ const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Order = require('../shemas/Order');
+const Order = require('./shemas/Order');
 
 // Create an Express application
 const app = express();
-const router = express.Router();
 const { Types } = mongoose;
 
 // Middleware setup
-router.use(express.json());
-router.use(cors());
+app.use(express.json());
+app.use(cors());
 
 // Set the port for the server
-const PORT = process.env.PORT || 9999;
+const PORT = 9999;
 
 // Set the path for Google Cloud credentials
 const credentialsPath = path.join(
@@ -53,7 +52,7 @@ let temporaryOrder = {
 };
 
 // Define a route for handling POST requests
-router.post('/', async (req, res) => {
+app.post('/', async (req, res) => {
   try {
     // Extract text data from the request body
     const requestData = req.body?.text;
@@ -216,6 +215,3 @@ async function detectIntent(projectId, sessionId, requestData) {
   // Return the detected intent from the response
   return responses[0].queryResult;
 }
-
-router.use('./netlify/functions/api', router);
-module.exports.handler = serverless(app);
