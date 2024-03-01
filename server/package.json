@@ -13,7 +13,7 @@
   "scripts": {
     "start": "node functions/app.js",
     "dev": "nodemon app.js",
-    "build": "netlify deploy --prod"
+    "build": "npm i"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
