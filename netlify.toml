@@ -5,7 +5,7 @@
   publish = "client/build"   # Adjust this based on your client build output
 
 [[redirects]]
-  from = "/api/*"
+  from = "/*"
   to = "http://localhost:9999/:splat"
   status = 200
 
