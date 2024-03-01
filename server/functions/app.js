@@ -8,7 +8,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const Order = require('./shemas/Order');
+const Order = require('../shemas/Order');
 
 // Create an Express application
 const app = express();
@@ -189,7 +189,7 @@ router.post('/', async (req, res) => {
 });
 
 // Start the server and listen on the specified port
-router.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
 
