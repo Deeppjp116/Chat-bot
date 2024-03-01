@@ -9,7 +9,7 @@ class MessageParser {
   parse(message) {
     console.log('clicked');
     axios
-      .post('http://localhost:9999/', { text: message })
+      .post('https://chat-bot-6.onrender.com/', { text: message })
       .then((response) => {
         console.log(response.data);
         console.log('Data received');
